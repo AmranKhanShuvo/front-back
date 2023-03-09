@@ -51,7 +51,7 @@ mongoose
   )
   .then(() => {
     console.log("MongoDB server connected.");
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT || 5000, () => {
       console.log("Backend server started.");
     });
   })
