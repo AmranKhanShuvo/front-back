@@ -4,38 +4,46 @@ import fs from "fs";
 import { HttpError } from "./models/http-error.js";
 import { placeRouter } from "./routes/places-routes.js";
 import { userRouter } from "./routes/users-routes.js";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
 mongoose.set("strictQuery", false);
 const app = express();
 app.use(express.json());
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
+app.use(express.static(path.join("public")));
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS"
-  );
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PATCH, DELETE, OPTIONS"
+//   );
 
-  if (req.method === "OPTIONS") {
-    res.sendStatus(200);
-  }
+//   if (req.method === "OPTIONS") {
+//     res.sendStatus(200);
+//   }
 
-  next();
-});
+//   next();
+// });
 
 app.use("/api/users", userRouter);
 app.use("/api/places", placeRouter);
 
 app.use((req, res, next) => {
-  return next(new HttpError("Could not find this route", 404));
+  res.sendFile(path.resolve(__dirname, "public", "index.html"));
 });
+
+// app.use((req, res, next) => {
+//   return next(new HttpError("Could not find this route", 404));
+// });
 
 app.use((error, req, res, next) => {
   if (req.file) {
